@@ -76,10 +76,10 @@ footer {
     border-radius: 16px;
     padding: 25px;
     box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    margin-top: 20px;
+    margin-top: 10px;
 }
 
-/* White background for entire expander */
+/* Expander style */
 .expander-white [data-testid="stExpander"] {
     background-color: #ffffff !important;
     border-radius: 12px;
@@ -88,7 +88,6 @@ footer {
     margin-bottom: 16px;
     padding: 0;
 }
-
 .expander-white [data-testid="stExpander"] > div:first-child {
     background-color: #ffffff !important;
     border-radius: 12px 12px 0 0;
@@ -96,7 +95,6 @@ footer {
     font-weight: 600;
     color: #333;
 }
-
 .expander-white [data-testid="stExpander"] > div:nth-child(2) {
     background-color: #ffffff !important;
     border-radius: 0 0 12px 12px;
@@ -131,41 +129,38 @@ if st.button("Check Interaction"):
         with st.spinner("🔍 Analyzing drug interactions..."):
             result = analyze_drug_interaction(valid_drugs)
 
-        # --- White background wrapper for results ---
-        with st.container():
-            st.markdown('<div class="report-section">', unsafe_allow_html=True)
-            st.subheader("🧠 Interaction Report")
+        # --- Parse Output ---
+        parsed = {"risks": "", "interactions": "", "conclusion": ""}
+        sections = re.split(r"###\s*\d\.\s*", result)
 
-            # --- Parse Output ---
-            parsed = {"risks": "", "interactions": "", "conclusion": ""}
-            sections = re.split(r"###\s*\d\.\s*", result)
+        if len(sections) >= 4:
+            parsed["risks"] = sections[1].strip()
+            parsed["interactions"] = sections[2].strip()
+            parsed["conclusion"] = sections[3].strip()
+        else:
+            parsed["interactions"] = result.strip()
 
-            if len(sections) >= 4:
-                parsed["risks"] = sections[1].strip()
-                parsed["interactions"] = sections[2].strip()
-                parsed["conclusion"] = sections[3].strip()
-            else:
-                parsed["interactions"] = result.strip()
+        # --- Report Section ---
+        st.subheader("🧠 Interaction Report")
 
-            # --- Risks
-            st.markdown('<div class="expander-white">', unsafe_allow_html=True)
-            with st.expander("💊 Risks / Side Effects", expanded=True):
-                st.markdown(parsed["risks"] or "No specific risks found.")
-            st.markdown('</div>', unsafe_allow_html=True)
+        # --- Risks
+        with st.expander("💊 Risks / Side Effects", expanded=True):
+            st.markdown(parsed["risks"] or "No specific risks found.")
+        st.markdown('</div>', unsafe_allow_html=True)
 
-            # --- Interactions
-            st.markdown('<div class="expander-white">', unsafe_allow_html=True)
-            with st.expander("🔄 Drug Interactions", expanded=True):
-                st.markdown(parsed["interactions"] or "No interaction data found.")
-            st.markdown('</div>', unsafe_allow_html=True)
+        # --- Interactions
+        st.markdown('<div class="expander-white">', unsafe_allow_html=True)
+        with st.expander("🔄 Drug Interactions", expanded=True):
+            st.markdown(parsed["interactions"] or "No interaction data found.")
+        st.markdown('</div>', unsafe_allow_html=True)
 
-            # --- Conclusion
-            st.markdown('<div class="expander-white">', unsafe_allow_html=True)
-            with st.expander("✅ Conclusion / Recommendations", expanded=True):
-                st.markdown(parsed["conclusion"] or "No specific conclusion found.")
-            st.markdown('</div>', unsafe_allow_html=True)
+        # --- Conclusion
+        st.markdown('<div class="expander-white">', unsafe_allow_html=True)
+        with st.expander("✅ Conclusion / Recommendations", expanded=True):
+            st.markdown(parsed["conclusion"] or "No specific conclusion found.")
+        st.markdown('</div>', unsafe_allow_html=True)
 
-            st.markdown('</div>', unsafe_allow_html=True)  # Close report-section
+        st.markdown('</div>', unsafe_allow_html=True)  # Close report-section
 
 # --- Footer ---
 st.markdown("---")
