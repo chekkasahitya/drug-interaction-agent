@@ -2,14 +2,19 @@ import os
 from dotenv import load_dotenv
 from openai import OpenAI
 
-# Load environment variables
+# Load .env variables
 load_dotenv()
 
-# Initialize OpenAI client
-api_key = os.getenv("OPENAI_API_KEY")
+# Get OpenRouter API key
+api_key = os.getenv("OPENROUTER_API_KEY")
 if not api_key:
-    raise RuntimeError("OPENAI_API_KEY not set in .env")
-client = OpenAI(api_key=api_key)
+    raise RuntimeError("OPENROUTER_API_KEY not set in .env")
+
+# Configure OpenAI client for OpenRouter
+client = OpenAI(
+    api_key=api_key,
+    base_url="https://openrouter.ai/api/v1"
+)
 
 def analyze_drug_interaction(drugs):
     drug_list = "\n".join(f"- {drug}" for drug in drugs)
@@ -28,8 +33,9 @@ def analyze_drug_interaction(drugs):
     )
 
     response = client.chat.completions.create(
-        model="gpt-3.5-turbo",
-        messages=[{"role": "user", "content": prompt}]
+        model="mistralai/mistral-7b-instruct",
+        messages=[{"role": "user", "content": prompt}],
+        temperature=0.7
     )
 
     return response.choices[0].message.content.strip()

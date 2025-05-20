@@ -31,7 +31,7 @@ try:
         left: 0;
         height: 100%;
         width: 100%;
-        background-color: rgba(255, 255, 255, 0.6);  /* translucent overlay */
+        background-color: rgba(255, 255, 255, 0.6);
         z-index: -1;
     }}
     </style>
@@ -70,7 +70,7 @@ footer {
     color: #888888;
 }
 
-/* White background specifically for output area */
+/* Report section wrapper */
 .report-section {
     background-color: #ffffff !important;
     border-radius: 16px;
@@ -78,20 +78,29 @@ footer {
     box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     margin-top: 20px;
 }
-.expander-white [data-testid="stExpander"] > div {
-    background-color: #ffffff !important;
-    border-radius: 12px;
-    padding: 20px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-}
-            
 
-/* Also target expanders for fallback */
-[data-testid="stExpander"] > div {
+/* White background for entire expander */
+.expander-white [data-testid="stExpander"] {
     background-color: #ffffff !important;
     border-radius: 12px;
+    border: 1px solid #ddd;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    margin-bottom: 16px;
+    padding: 0;
+}
+
+.expander-white [data-testid="stExpander"] > div:first-child {
+    background-color: #ffffff !important;
+    border-radius: 12px 12px 0 0;
+    padding: 15px 20px;
+    font-weight: 600;
+    color: #333;
+}
+
+.expander-white [data-testid="stExpander"] > div:nth-child(2) {
+    background-color: #ffffff !important;
+    border-radius: 0 0 12px 12px;
     padding: 20px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
 </style>
 """, unsafe_allow_html=True)
@@ -138,19 +147,26 @@ if st.button("Check Interaction"):
             else:
                 parsed["interactions"] = result.strip()
 
+            # --- Risks
             st.markdown('<div class="expander-white">', unsafe_allow_html=True)
             with st.expander("💊 Risks / Side Effects", expanded=True):
                 st.markdown(parsed["risks"] or "No specific risks found.")
             st.markdown('</div>', unsafe_allow_html=True)
 
-
+            # --- Interactions
+            st.markdown('<div class="expander-white">', unsafe_allow_html=True)
             with st.expander("🔄 Drug Interactions", expanded=True):
                 st.markdown(parsed["interactions"] or "No interaction data found.")
+            st.markdown('</div>', unsafe_allow_html=True)
 
+            # --- Conclusion
+            st.markdown('<div class="expander-white">', unsafe_allow_html=True)
             with st.expander("✅ Conclusion / Recommendations", expanded=True):
                 st.markdown(parsed["conclusion"] or "No specific conclusion found.")
             st.markdown('</div>', unsafe_allow_html=True)
 
+            st.markdown('</div>', unsafe_allow_html=True)  # Close report-section
+
 # --- Footer ---
 st.markdown("---")
-st.markdown("<footer>Powered by OpenAI & LangChain</footer>", unsafe_allow_html=True)
+st.markdown("<footer>Powered by OpenRouter & LangChain</footer>", unsafe_allow_html=True)
